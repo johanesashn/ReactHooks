@@ -1,21 +1,14 @@
-import { memo, useCallback, useMemo, useState } from "react";
-
-type ChildProps = {
-  numbers: Int16Array[], 
-  expensive: () => void
-}
-
-const Child = memo(({numbers, expensive}: ChildProps) => {
-  console.log("child rendered")
-  return (
-    <button onClick={expensive}>
-      {numbers.map((number, key) => <p key={key}>{number}</p>)}
-    </button>
-  )
-})
+import { useCallback, useMemo, useState } from "react";
+import { useToggle, useFetch } from "./hooks";
+import ThemeProvider from "./context/ThemeContext";
+import Child from "./components/Child";
 
 const App = () => {
   const [count, setCount] = useState(0);
+  const [isOpen, toggle] = useToggle(false)
+  const { data, loading } = useFetch(
+    "https://jsonplaceholder.typicode.com/users"
+  )
 
   const numbers = useMemo(() => {
     return [1,2,3,4]
@@ -27,12 +20,22 @@ const App = () => {
 
   console.log("parent rendered")
 
+  if (loading) {
+    return <p>loading</p>
+  }
+
   return (
-    <>
+    <ThemeProvider>
       <div>here is the div {count}</div>
       <button onClick={() => setCount(count + 1)}>click me</button>
+      <button onClick={toggle}>{isOpen ? "open" : "closed"}</button>
       <Child numbers={numbers} expensive={expensive}/>
-    </>
+      {
+        data?.map((user:any) => (
+          <p key={user.id}>{user.name}</p>
+        ))
+      }
+    </ThemeProvider>
   )
 }
 
