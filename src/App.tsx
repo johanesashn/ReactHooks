@@ -21,7 +21,7 @@ const App = () => {
   console.log("parent rendered")
 
   if (loading) {
-    return <p>loading</p>
+    return <p>loading lagi boi</p>
   }
 
   return (
